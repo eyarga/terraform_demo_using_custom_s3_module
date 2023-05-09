@@ -1,14 +1,14 @@
 output "bucket_id" {
   description = "Bucket id"
-  value       = aws_s3_bucket.website.id
+  value       = module.my_static_website.bucket_id
 }
 
 output "bucket_arn" {
   description = "Bucket arn"
-  value       = aws_s3_bucket.website.arn
+  value       = module.my_static_website.bucket_arn
 }
 
 output "bucket_website_endpoint" {
   description = "Bucket arn"
-  value       = aws_s3_bucket_website_configuration.this.website_endpoint
+  value       = "http://${module.static_website.bucket_website_endpoint}"
 }

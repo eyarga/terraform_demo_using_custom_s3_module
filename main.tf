@@ -1,41 +1,8 @@
-locals {
-  random_suffix = var.create_random_suffix ? "${var.bucket_name}-${random_pet.suffix.id}" : var.bucket_name
-  name_with_env = "${local.random_suffix}-${var.env}"
-}
+module "static_website" {
+  source = "github.com/eyarga/terraform_module_s3_website.git?ref=v1.0.1"
 
-resource "aws_s3_bucket" "website" {
-  bucket        = local.name_with_env
-  tags          = var.tags
-  force_destroy = true
-}
+  bucket_name          = var.bucket_name
+  create_random_suffix = true
+  environment          = var.environment
 
-resource "random_pet" "suffix" {
-  separator = ""
 }
-
-resource "aws_s3_bucket_website_configuration" "this" {
-  bucket = aws_s3_bucket.website.bucket
-  index_document {
-    suffix = var.index_document
-  }
-  error_document {
-    key = var.error_document
-  }
-}
-
-resource "aws_s3_bucket_policy" "allow_public_read" {
-  bucket = aws_s3_bucket.website.id
-  policy = data.aws_iam_policy_document.allow_public_read.json
-}
-
-data "aws_iam_policy_document" "allow_public_read" {
-  statement {
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.website.arn}/*"]
-  }
-}
-
